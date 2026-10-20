@@ -15,3 +15,19 @@
       border: "border-primary"
     });
   };
+
+
+Refactorizada
+const handleSelection = (selection) => {
+  const option = randomSelection.find(
+    (option) => option.selection === selection
+  );
+
+  if (!option) return;
+
+  setUserSelection({ ...option });
+};
+
+const handleRockSelection = () => handleSelection("rock");
+const handlePaperSelection = () => handleSelection("paper");
+const handleScissorsSelection = () => handleSelection("scissors");
