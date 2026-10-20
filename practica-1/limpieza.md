@@ -16,8 +16,7 @@
     });
   };
 
-
-Refactorizada
+Version Refactorizada
 const handleSelection = (selection) => {
   const option = randomSelection.find(
     (option) => option.selection === selection
