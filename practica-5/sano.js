@@ -1,5 +1,4 @@
-const DESCUENTO_MAYORISTA = 0.1;
-const DESCUENTO_FRECUENTE = 0.05;
+const TASAS_DESCUENTO = Object.freeze({ mayorista: 0.1, frecuente: 0.05 });
 const TASA_ISV = 0.15;
 const RECARGO_TARJETA = 0.03;
 const CENTAVOS_POR_LEMPIRA = 100;
@@ -12,16 +11,10 @@ function calcularSubtotal(items) {
   return subtotalCentavos;
 }
 
-function calcularTotales(items, tipoCliente, tipoPago) {
+function calcularTotales(items, tipoCliente, tipoPago, tasasDescuento) {
   const subtotalCentavos = calcularSubtotal(items);
-  let descuentoCentavos = 0;
-  if (tipoCliente === 'mayorista') {
-    descuentoCentavos = Math.round(subtotalCentavos * DESCUENTO_MAYORISTA);
-  } else if (tipoCliente === 'frecuente') {
-    descuentoCentavos = Math.round(subtotalCentavos * DESCUENTO_FRECUENTE);
-  } else {
-    descuentoCentavos = 0;
-  }
+  const tasaDescuento = Object.hasOwn(tasasDescuento, tipoCliente) ? tasasDescuento[tipoCliente] : 0;
+  const descuentoCentavos = Math.round(subtotalCentavos * tasaDescuento);
   const isvCentavos = Math.round((subtotalCentavos - descuentoCentavos) * TASA_ISV);
   let totalCentavos = subtotalCentavos - descuentoCentavos + isvCentavos;
   if (tipoPago === 'tarjeta') {
@@ -39,7 +32,10 @@ function crearTicket(cliente, totalCentavos) {
   return `Cliente: ${cliente.nombre}\nTotal: L ${(totalCentavos / CENTAVOS_POR_LEMPIRA).toFixed(2)}`;
 }
 
-function procesarVenta(cliente, items, tipoPago, { registrarVenta = console.log } = {}) {
+function procesarVenta(cliente, items, tipoPago, {
+  registrarVenta = console.log,
+  tasasDescuento = TASAS_DESCUENTO,
+} = {}) {
   if (!cliente.activo) {
     return null;
   }
@@ -47,7 +43,7 @@ function procesarVenta(cliente, items, tipoPago, { registrarVenta = console.log 
     return null;
   }
 
-  const totales = calcularTotales(items, cliente.tipo, tipoPago);
+  const totales = calcularTotales(items, cliente.tipo, tipoPago, tasasDescuento);
   const ticket = crearTicket(cliente, totales.totalCentavos);
   registrarVenta(ticket);
   return { ...totales, ticket };

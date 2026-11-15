@@ -67,6 +67,49 @@ test('propaga el mismo error del adaptador', () => {
   );
 });
 
+test('agrega un tipo de cliente mediante configuración sin editar el cálculo', () => {
+  const tasasDescuento = Object.freeze({ estudiante: 0.2 });
+  const resultado = procesarVenta({ ...cliente, tipo: 'estudiante' }, items, 'tarjeta', {
+    tasasDescuento,
+    registrarVenta: () => {},
+  });
+
+  assert.deepEqual(resultado, {
+    subtotalCentavos: 10000,
+    descuentoCentavos: 2000,
+    isvCentavos: 1200,
+    totalCentavos: 9476,
+    ticket: 'Cliente: Ana\nTotal: L 94.76',
+  });
+  assert.deepEqual(tasasDescuento, { estudiante: 0.2 });
+});
+
+test('cambia una tasa sin mutar los descuentos predeterminados', () => {
+  const mayorista = { ...cliente, tipo: 'mayorista' };
+  const personalizado = procesarVenta(mayorista, items, 'efectivo', {
+    tasasDescuento: { mayorista: 0.25 },
+    registrarVenta: () => {},
+  });
+  const predeterminado = procesarVenta(mayorista, items, 'efectivo', {
+    registrarVenta: () => {},
+  });
+
+  assert.equal(personalizado.descuentoCentavos, 2500);
+  assert.equal(personalizado.totalCentavos, 8625);
+  assert.equal(predeterminado.descuentoCentavos, 1000);
+  assert.equal(predeterminado.totalCentavos, 10350);
+});
+
+test('ignora descuentos heredados del prototipo de la configuración', () => {
+  const resultado = procesarVenta({ ...cliente, tipo: 'estudiante' }, items, 'efectivo', {
+    tasasDescuento: Object.create({ estudiante: 0.2 }),
+    registrarVenta: () => {},
+  });
+
+  assert.equal(resultado.descuentoCentavos, 0);
+  assert.equal(resultado.totalCentavos, 11500);
+});
+
 process.on('exit', () => {
   console.log(`\nResultado: ${aprobados} aprobados, ${fallidos} fallidos`);
 });
