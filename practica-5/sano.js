@@ -39,7 +39,7 @@ function crearTicket(cliente, totalCentavos) {
   return `Cliente: ${cliente.nombre}\nTotal: L ${(totalCentavos / CENTAVOS_POR_LEMPIRA).toFixed(2)}`;
 }
 
-function procesarVenta(cliente, items, tipoPago) {
+function procesarVenta(cliente, items, tipoPago, { registrarVenta = console.log } = {}) {
   if (!cliente.activo) {
     return null;
   }
@@ -49,7 +49,7 @@ function procesarVenta(cliente, items, tipoPago) {
 
   const totales = calcularTotales(items, cliente.tipo, tipoPago);
   const ticket = crearTicket(cliente, totales.totalCentavos);
-  console.log(ticket);
+  registrarVenta(ticket);
   return { ...totales, ticket };
 }
 
