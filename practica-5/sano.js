@@ -17,17 +17,13 @@ function procesarVenta(cliente, items, tipoPago) {
       }
       if (cliente.tipo === 'mayorista') {
         descuentoCentavos = Math.round(subtotalCentavos * DESCUENTO_MAYORISTA);
-        isvCentavos = Math.round((subtotalCentavos - descuentoCentavos) * TASA_ISV);
-        totalCentavos = subtotalCentavos - descuentoCentavos + isvCentavos;
       } else if (cliente.tipo === 'frecuente') {
         descuentoCentavos = Math.round(subtotalCentavos * DESCUENTO_FRECUENTE);
-        isvCentavos = Math.round((subtotalCentavos - descuentoCentavos) * TASA_ISV);
-        totalCentavos = subtotalCentavos - descuentoCentavos + isvCentavos;
       } else {
         descuentoCentavos = 0;
-        isvCentavos = Math.round((subtotalCentavos - descuentoCentavos) * TASA_ISV);
-        totalCentavos = subtotalCentavos - descuentoCentavos + isvCentavos;
       }
+      isvCentavos = Math.round((subtotalCentavos - descuentoCentavos) * TASA_ISV);
+      totalCentavos = subtotalCentavos - descuentoCentavos + isvCentavos;
       if (tipoPago === 'tarjeta') {
         totalCentavos += Math.round(totalCentavos * RECARGO_TARJETA);
       }
